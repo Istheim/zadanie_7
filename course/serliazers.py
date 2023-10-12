@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from course.models import Course
+from course.models import Course, Subscrip
+from course.validators import UrlValidator
 from lesson.serliazers import LessonSerializer
 from user.serliazers import UserSerializer
 
@@ -15,4 +16,17 @@ class CourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
+        fields = '__all__'
+        validators = [
+            UrlValidator(fields=['title', 'description']),
+            serializers.UniqueTogetherValidator(fields=['title', 'description'],
+                                                queryset=Course.objects.all())
+        ]
+
+
+class SubscripSerializer(serializers.ModelSerializer):
+    """ Сериализотор подписок(подписан или нет) """
+
+    class Meta:
+        model = Subscrip
         fields = '__all__'

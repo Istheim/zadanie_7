@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 from user.models import User, UserRoles
@@ -17,3 +18,19 @@ class Course(models.Model):
     class Meta:
         verbose_name = 'Курс'
         verbose_name_plural = 'Курсы'
+
+
+class Subscrip(models.Model):
+    """ Класс для модели подписок"""
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+                             verbose_name="Пользователь", )
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name='Курс', **NULLABLE)
+    subscribed = models.BooleanField(default=False, verbose_name='Статус подписки')
+
+    def __str__(self):
+        return f"{self.user} - {self.course}"
+
+    class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
