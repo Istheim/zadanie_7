@@ -1,3 +1,4 @@
+import json
 from builtins import list
 
 from rest_framework import status
@@ -17,7 +18,7 @@ class SubscripTestCase(APITestCase):
 
         self.user = User.objects.create(email='admin@mail.ru', password='admin', is_superuser=True)
         self.token = f'Bearer {AccessToken.for_user(self.user)}'
-        self.course = Course.objects.create(name_courses="TEST", description_courses="TEST", owner=self.user)
+        self.course = Course.objects.create(title="TEST", description="TEST", user=self.user)
 
         self.data = {
             'user': self.user,
@@ -36,8 +37,9 @@ class SubscripTestCase(APITestCase):
         }
 
         response = self.client.post(
-            reverse('course:subscrip-list'),
-            data=expected_data,
+            reverse('subscription-list'),
+            data=json.dumps(expected_data),
+            content_type='application/json',
             HTTP_AUTHORIZATION=self.token
         )
 
@@ -71,8 +73,9 @@ class SubscripTestCase(APITestCase):
         }
 
         response = self.client.patch(
-            reverse('course:subscrip-detail', kwargs={'id': self.subscription.pk}),
-            data=expected_data,
+            reverse('subscription-detail', kwargs={'id': self.subscription.pk}),
+            data=json.dumps(expected_data),
+            content_type='application/json',
             HTTP_AUTHORIZATION=self.token
         )
 
