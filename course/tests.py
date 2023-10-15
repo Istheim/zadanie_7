@@ -37,7 +37,7 @@ class SubscripTestCase(APITestCase):
         }
 
         response = self.client.post(
-            reverse('subscription-list'),
+            reverse('course:subscrip-list'),
             data=json.dumps(expected_data),
             content_type='application/json',
             HTTP_AUTHORIZATION=self.token
@@ -73,8 +73,7 @@ class SubscripTestCase(APITestCase):
         }
 
         response = self.client.patch(
-            reverse('subscription-detail', kwargs={'id': self.subscription.pk}),
-            data=json.dumps(expected_data),
+            reverse('course:subscrip-detail', kwargs={'id': self.subscription.pk}),            data=json.dumps(expected_data),
             content_type='application/json',
             HTTP_AUTHORIZATION=self.token
         )
