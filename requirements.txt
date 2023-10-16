@@ -6,3 +6,4 @@ sqlparse
 djangorestframework
 django-filter
 djangorestframework-simplejwt
+coverage

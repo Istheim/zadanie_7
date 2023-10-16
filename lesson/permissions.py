@@ -15,8 +15,8 @@ class IsModerator(BasePermission):
 class IsOwner(BasePermission):
     message = 'Вы не являетесь владельцем!'
 
-    def has_permission(self, request, view, obj):
-        if request.user.role == obj.user:
+    def has_object_permission(self, request, view, obj):
+        if request.user == obj.user:
             return True
         return False
 
