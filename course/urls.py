@@ -7,7 +7,7 @@ app_name = CourseConfig.name
 
 router = DefaultRouter()
 router.register(r'courses', CourseViewSet, basename='courses')
-router.register(r'subscrip', SubscriptionViewSet, basename='sibscrip')
+router.register(r'subscrip', SubscriptionViewSet, basename='subscrip')
 
 urlpatterns = [
 

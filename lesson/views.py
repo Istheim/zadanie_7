@@ -1,15 +1,16 @@
 from rest_framework import generics, viewsets
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from lesson.models import Lesson, Subscrib
+from lesson.models import Lesson
 from lesson.paginators import LessonPaginator
 from lesson.permissions import IsOwner, IsModerator, IsMember
-from lesson.serliazers import LessonSerializer, SubscribSerializer
+from lesson.serliazers import LessonSerializer
 
 
 class LessonCreateAPIView(generics.CreateAPIView):
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated, IsMember]
+    #permission_classes = [AllowAny]
 
     def perform_create(self, serializer):
         new_lesson = serializer.save()
@@ -34,22 +35,9 @@ class LessonUpdateAPIView(generics.UpdateAPIView):
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
     permission_classes = [IsAuthenticated, IsModerator | IsOwner]
+    #permission_classes = [AllowAny]
 
 
 class LessonDestroyAPIView(generics.DestroyAPIView):
     queryset = Lesson.objects.all()
     permission_classes = [IsAuthenticated, IsOwner]
-
-
-class SubscribViewSet(viewsets.ModelViewSet):
-    """ ViewSet для подписок """
-
-    serializer_class = SubscribSerializer
-    queryset = Subscrib.objects.all()
-    lookup_field = 'id'
-
-    def perform_create(self, serializer):
-        """ Сохранение подписки True или False для определенного пользователя"""
-
-        new_subscription = serializer.save(user=self.request.user)  # Привязка
-        new_subscription.save()  # Сохраняем

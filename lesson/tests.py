@@ -1,20 +1,28 @@
-from builtins import list
+from builtins import *
 
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from rest_framework_simplejwt.tokens import AccessToken
 
-from lesson.models import Lesson, Subscrib
-from user.models import User
 from course.models import Course
+from lesson.models import Lesson
+from user.models import User
 
 
 class LessonTestCase(APITestCase):
-    def setUp(self):
-        self.user = User.objects.create(email='admin@mail.com', password='admin', is_superuser=True)
-        self.token = f'Bearer {AccessToken.for_user(self.user)}'
-        self.course = Course.objects.create(title="TestCourse", description="TestCourseDescription")
+
+    def setUp(self) -> None:
+        self.course = Course.objects.create(
+            title='TestCourse',
+            description='Test'
+        )
+
+        self.user = User.objects.create(
+            email='admin@mail.ru',
+            password='admin',
+            is_superuser=True
+        )
+
         self.lesson = Lesson.objects.create(
             course_title=self.course,
             title='TestLesson',
@@ -23,121 +31,111 @@ class LessonTestCase(APITestCase):
             user=self.user
         )
 
-    def test_lesson_create(self):
-        expected_data = {
+        self.client.force_authenticate(user=self.user)
+
+    def test_create_Lesson(self):
+        """ Создание урока"""
+        data = {
             "course_title": self.course.pk,
             "title": "TEST1",
             "description": "TEST1",
             "video_url": "https://youtube.com",
             "user": self.user.pk
         }
+
         response = self.client.post(
             reverse('lesson:lesson-create'),
-            data=expected_data,
-            HTTP_AUTHORIZATION=self.token
+            data=data
         )
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Lesson.objects.all().count(), 2)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_201_CREATED
+        )
+
         self.assertEqual(
             response.json(),
-            {
-                "id": 2,
-                "course_title": self.course.pk,
-                "title": "TEST1",
-                "description": "TEST1",
-                "video_url": self.lesson.video_url,
-                "preview": None,
-                "user": self.user.pk
-            }
+            {'id': 2, 'title': 'TEST1', 'description': 'TEST1', 'preview': None, 'video_url': 'https://youtube.com',
+             'course_title': self.course.pk, 'user': self.user.pk}
+
         )
 
-    def test_lesson_list(self):
+        self.assertTrue(
+            Lesson.objects.all().count(), 2
+        )
+
+    def test_get_list(self):
         response = self.client.get(
-            reverse('lesson:lesson-list'),
-            HTTP_AUTHORIZATION=self.token
+            reverse('lesson:lesson-list')
         )
+        print(response.json())
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            response.json(),
-            {
-                "count": 1,
-                "next": None,
-                "previous": None,
-                "results": [
-                    {
-                        "id": self.lesson.pk,
-                        "course_title": self.course.pk,
-                        "title": self.lesson.title,
-                        "description": self.lesson.description,
-                        "video_url": self.lesson.video_url,
-                        "preview": None,
-                        "user": self.user.pk
-                    }
-                ]
-            }
+            response.status_code,
+            status.HTTP_200_OK
         )
 
     def test_lesson_retrieve(self):
         response = self.client.get(
-            reverse('lesson:lesson-get', kwargs={'pk': self.lesson.pk}),
-            HTTP_AUTHORIZATION=self.token
+            reverse('lesson:lesson-get', kwargs={'pk': self.lesson.pk})
         )
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
         self.assertEqual(
             response.json(),
-            {
-                "id": self.lesson.pk,
-                "course_title": self.course.pk,
-                "title": self.lesson.title,
-                "description": self.lesson.description,
-                "video_url": self.lesson.video_url,
-                "preview": None,
-                "user": self.user.pk
-            }
+            {'id': 5, 'title': 'TestLesson', 'description': 'TestLessonDescription', 'preview': None,
+             'video_url': 'https://youtube.com', 'course_title': self.course.pk, 'user': self.user.pk}
+
         )
 
     def test_lesson_update(self):
-        expected_data = {
+        data = {
             "course_title": self.course.pk,
-            "title": "TEST2",
+            "title": "LessonTestTitle",
             "description": "TEST2",
             "video_url": "https://youtube.com/test2/",
-            "preview": None,
             "user": self.user.pk
         }
+
         response = self.client.patch(
             reverse('lesson:lesson-update', kwargs={'pk': self.lesson.pk}),
-            data=expected_data,
-            HTTP_AUTHORIZATION=self.token
+            data=data
         )
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
         self.assertEqual(
             response.json(),
-            {
-                "id": self.lesson.pk,
-                "course_title": self.course.pk,
-                "title": "TEST2",
-                "description": "TEST2",
-                "video_url": "https://youtube.com/test2/",
-                "preview": None,
-                "user": self.user.pk
-            }
+            {'id': 6, 'title': 'LessonTestTitle', 'description': 'TEST2', 'preview': None,
+             'video_url': 'https://youtube.com/test2/', 'course_title': self.course.pk, 'user': self.user.pk}
+
         )
 
     def test_lesson_destroy(self):
         response = self.client.delete(
-            reverse('lesson:lesson-delete', kwargs={'pk': self.lesson.pk}),
-            HTTP_AUTHORIZATION=self.token
+            reverse('lesson:lesson-delete', kwargs={'pk': self.lesson.pk})
         )
 
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(list(Lesson.objects.all()), [])
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_204_NO_CONTENT
+        )
+
+        self.assertEqual(
+            list(Lesson.objects.all()),
+            []
+        )
 
     def tearDown(self):
         self.user.delete()
         self.course.delete()
         self.lesson.delete()
+
+

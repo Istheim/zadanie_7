@@ -1,36 +1,40 @@
-import json
-from builtins import list
+from builtins import *
 
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
-from rest_framework_simplejwt.tokens import AccessToken
 
 from course.models import Course, Subscrip
 from user.models import User
 
 
 class SubscripTestCase(APITestCase):
-    """ Тестирование подписки на курс """
 
     def setUp(self):
-        """ Тестовые настройки создание экземпляров моделей """
+        self.course = Course.objects.create(
+            title='TestCourse',
+            description='Test',
+            #user=self.user
+        )
 
-        self.user = User.objects.create(email='admin@mail.ru', password='admin', is_superuser=True)
-        self.token = f'Bearer {AccessToken.for_user(self.user)}'
-        self.course = Course.objects.create(title="TEST", description="TEST", user=self.user)
+        self.user = User.objects.create(
+            email='admin@mail.ru',
+            password='admin',
+            is_superuser=True
+        )
 
         self.data = {
             'user': self.user,
             'course': self.course,
         }
-
         self.subscription = Subscrip.objects.create(**self.data)
+
+        self.client.force_authenticate(user=self.user)
 
     def test_create_subscription(self):
         """ Тестирование подписки на курс """
 
-        expected_data = {
+        data = {
             'user': self.user.pk,
             'course': self.course.pk,
             'subscribed': True
@@ -38,9 +42,7 @@ class SubscripTestCase(APITestCase):
 
         response = self.client.post(
             reverse('course:subscrip-list'),
-            data=json.dumps(expected_data),
-            content_type='application/json',
-            HTTP_AUTHORIZATION=self.token
+            data=data,
         )
 
         self.assertEqual(
@@ -66,16 +68,15 @@ class SubscripTestCase(APITestCase):
     def test_unsubscribe(self):
         """ Тестирование отписки на курс """
 
-        expected_data = {
+        data = {
             'user': self.user.pk,
             'course': self.course.pk,
             'subscribed': False
         }
 
         response = self.client.patch(
-            reverse('course:subscrip-detail', kwargs={'id': self.subscription.pk}),            data=json.dumps(expected_data),
-            content_type='application/json',
-            HTTP_AUTHORIZATION=self.token
+            reverse('course:subscrip-detail', kwargs={'id': self.subscription.pk}),
+            data=data,
         )
 
         self.assertEqual(
@@ -103,7 +104,6 @@ class SubscripTestCase(APITestCase):
 
         response = self.client.get(
             reverse('course:subscrip-list'),
-            HTTP_AUTHORIZATION=self.token
         )
 
         self.assertEqual(
@@ -120,8 +120,7 @@ class SubscripTestCase(APITestCase):
         """ Тестирование вывода одной подписки """
 
         response = self.client.get(
-            reverse('course:subscrip-detail', kwargs={'id': self.subscription.pk}),
-            HTTP_AUTHORIZATION=self.token
+            reverse('course:subscrip-detail', kwargs={'id': self.subscription.pk})
         )
 
         self.assertEqual(
@@ -143,8 +142,7 @@ class SubscripTestCase(APITestCase):
         """ Тестирование удаления подписки """
 
         response = self.client.delete(
-            reverse('course:subscrip-detail', kwargs={'id': self.subscription.pk}),
-            HTTP_AUTHORIZATION=self.token
+            reverse('course:subscrip-detail', kwargs={'id': self.subscription.pk})
         )
 
         self.assertEqual(
