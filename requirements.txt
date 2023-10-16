@@ -7,3 +7,6 @@ djangorestframework
 django-filter
 djangorestframework-simplejwt
 coverage
+djangorestframework
+drf-yasg
+coreapi
