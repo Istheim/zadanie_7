@@ -10,3 +10,4 @@ coverage
 djangorestframework
 drf-yasg
 coreapi
+stripe

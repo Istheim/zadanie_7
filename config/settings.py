@@ -157,3 +157,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'user.User'
+
+
+STRIPE_PUBLIC_KEY = 'pk_test_51O1unbEl15BaqTIrL5vB8Xi3N0najmqw43O6a7aor7CR32fW9Cr1rVqjSaEDVeub6Ce4fXbeG1z8PeoG8p4t2qug00VLcC0mgS'
+STRIPE_SECRET_KEY = 'sk_test_51O1unbEl15BaqTIrQlPukc6JFZZWxR8nrT6FRGYthaThROBPHUGJdqLLIgtNYU4cxSUhFReyZlaiyhwhnEggJ8tQ00ug9VAhcB'
