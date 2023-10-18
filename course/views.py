@@ -1,5 +1,6 @@
 from builtins import *
 
+from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -9,6 +10,7 @@ from course.models import Course, Subscrip
 from course.paginators import CoursePaginator
 from course.serliazers import CourseSerializer, SubscripSerializer
 from user.models import UserRoles
+from course.task import send_subscription_notification
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -41,3 +43,11 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
 
         new_subscription = serializer.save(user=self.request.user)  # Привязка
         new_subscription.save()  # Сохраняем
+
+    def update_course_materials(request, course_id):
+        # Ваш код обновления материалов курса
+
+        # После обновления отправляем уведомление
+        send_subscription_notification.delay(course_id)
+
+        return HttpResponse('Материалы курса успешно обновлены!')

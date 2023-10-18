@@ -11,3 +11,5 @@ djangorestframework
 drf-yasg
 coreapi
 stripe
+celery
+redis
