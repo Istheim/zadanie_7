@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 from datetime import timedelta
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -150,8 +151,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'user.User'
 
-STRIPE_PUBLIC_KEY = 'pk_test_51O1unbEl15BaqTIrL5vB8Xi3N0najmqw43O6a7aor7CR32fW9Cr1rVqjSaEDVeub6Ce4fXbeG1z8PeoG8p4t2qug00VLcC0mgS'
-STRIPE_SECRET_KEY = 'sk_test_51O1unbEl15BaqTIrQlPukc6JFZZWxR8nrT6FRGYthaThROBPHUGJdqLLIgtNYU4cxSUhFReyZlaiyhwhnEggJ8tQ00ug9VAhcB'
+STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY')
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 
 CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
 CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
