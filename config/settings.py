@@ -13,6 +13,8 @@ from datetime import timedelta
 from pathlib import Path
 import os
 
+from django.utils import timezone
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -45,6 +47,7 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework_simplejwt',
     'drf_yasg',
+    'django_celery_beat',
 ]
 
 REST_FRAMEWORK = {
@@ -156,3 +159,12 @@ STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 
 CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
 CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_BEAT_SCHEDULE = {
+    'block-inactive-users': {
+        'task': 'users.tasks.block_inactive_users',
+        'schedule': timezone.timedelta(days=1),  # Запускать задачу каждый день
+    },
+}

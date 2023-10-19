@@ -13,3 +13,4 @@ coreapi
 stripe
 celery
 redis
+django-celery-beat
